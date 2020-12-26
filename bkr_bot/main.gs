@@ -92,10 +92,12 @@ function makeMessage(message, groupId) {
     pushmessage_image(groupId);
     return "";
   }
-
   if (message.indexOf("まじか") != -1) {
     majikaRoulette(groupId);
     return "";
+  }
+  if (message.indexOf("ソースコード") != -1) {
+    return "https://github.com/yyosuke456/line_bot/tree/master/bkr_bot";
   }
   return "";
 }
