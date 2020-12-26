@@ -1,7 +1,10 @@
-const ACCESS_TOKEN = "***";
-const line_endpoint = "***";
+//const ACCESS_TOKEN = スクリプトのプロパティに移動
+//const line_endpoint = スクリプトのプロパティに移動
 
+// 受け取ったメッセージに応じてメッセージを送信
 function doPost(e) {
+  saveMessageResponse(e);
+  const groupId = getGroupId(e);
   const json = JSON.parse(e.postData.contents);
 
   //返信Token
@@ -13,16 +16,17 @@ function doPost(e) {
   let message = json.events[0].message.text; //LINEに投稿されたメッセージはここ
 
   //★step2 メッセージを動的に作成
-  let replyContent = makeMessage(message);
+  let replyContent = makeMessage(message, groupId);
 
   if (replyContent == "") {
     return;
   }
   // メッセージを返信
-  UrlFetchApp.fetch(line_endpoint, {
+  const prop = PropertiesService.getScriptProperties().getProperties();
+  UrlFetchApp.fetch(prop.line_endpoint, {
     headers: {
       "Content-Type": "application/json; charset=UTF-8",
-      Authorization: "Bearer " + ACCESS_TOKEN,
+      Authorization: "Bearer " + prop.ACCESS_TOKEN,
     },
     method: "post",
     payload: JSON.stringify({
@@ -40,8 +44,7 @@ function doPost(e) {
   ).setMimeType(ContentService.MimeType.JSON);
 }
 
-//★step2用
-function makeMessage(message) {
+function makeMessage(message, groupId) {
   //★step3 GSSからランダムに取得
   if (message.indexOf("食レポ") != -1) {
     return getFromGssRepo();
@@ -68,16 +71,13 @@ function makeMessage(message) {
     return getFromGssMeigen();
   }
   if (message.indexOf("シート出して") != -1) {
-    return "***";
-  }
-  if (message.indexOf("シート出して") != -1) {
-    return "***";
+    return PropertiesService.getScriptProperties().getProperties().SHEET_URL;
   }
   if (message.indexOf("消臭力") != -1) {
     return "https://www.youtube.com/watch?v=N-39ZWTfXSk";
   }
   if (message.indexOf("ボカロの呪文") != -1) {
-    return "食レポ\n美味しい？\nおはよう\nこんにちは\nこんばんは\nはじめまして\nおやすみ\n名言\nシート出して\nwiki\nを検索して\nで検索して\n消臭力";
+    return "食レポ\n美味しい？\nおはよう\nこんにちは\nこんばんは\nはじめまして\nおやすみ\n名言\nシート出して\nwiki\nを検索して\nで検索して\n消臭力\nスタンプ\nまじか";
   }
   if (message.indexOf("wiki") != -1) {
     return getWikiPageRandom();
@@ -89,7 +89,12 @@ function makeMessage(message) {
     return getWikiSearchResult(message.replace("で検索して", ""));
   }
   if (message.indexOf("スタンプ") != -1) {
-    pushImage();
+    pushmessage_image(groupId);
+    return "";
+  }
+
+  if (message.indexOf("まじか") != -1) {
+    majikaRoulette(groupId);
     return "";
   }
   return "";
@@ -135,54 +140,65 @@ function getFromGssMeigen() {
   return word;
 }
 
-function getWikiPageRandom() {
-  return getRedirect("http://ja.wikipedia.org/wiki/Special:Randompage");
-}
-
-function getRedirect(url) {
-  let response = UrlFetchApp.fetch(url, {
-    followRedirects: false,
-    muteHttpExceptions: false,
-  });
-  let redirectUrl = response.getHeaders()["Location"]; // undefined if no redirect, so...
-  let responseCode = response.getResponseCode(); // ...it calls itself recursively...
-  if (redirectUrl) {
-    // ...if redirected...
-    let nextRedirectUrl = getRedirect(redirectUrl);
-    return nextRedirectUrl;
-  } else {
-    // ...until it's not
-    return url;
+//画像メッセージを送る
+//画像の追加→'https://drive.google.com/uc?id=',//
+function pushmessage_image(groupId) {
+  const stampList = ["superCombo", "*"];
+  const index = Math.floor(Math.random() * stampList.length);
+  if (index == 0) {
+    postUperCombo(groupId);
+    return;
   }
+
+  const stamp = stampList[index];
+  postImage(groupId, stamp);
 }
 
-function getWikiSearchResult(word) {
-  return "https://ja.wikipedia.org/w/index.php?search=" + word;
+//スーパーコンボ
+function postUperCombo(groupId) {
+  postImage(groupId, "*");
+  postImage(groupId, "*");
+  postImage(groupId, "*");
 }
 
-//画像を送信
-function pushImage() {
-  //const url = "https://api.line.me/v2/bot/message/push";
-  const imageHeaders = {
-    "Content-Type": "application/json; charset=UTF-8",
-    Authorization: "Bearer " + ACCESS_TOKEN,
-  };
+function majikaRoulette(groupId) {
+  const majikaList = ["***"];
 
-  const postImageData = {
-    messages: [
-      {
-        type: "image",
-        originalContentUrl: "***",
-        previewImageUrl: "***",
-      },
-    ],
-  };
+  let shuffled = [];
 
-  const options = {
-    method: "post",
-    headers: imageHeaders,
-    payload: JSON.stringify(postImageData),
-  };
+  while (majikaList.length > 0) {
+    n = majikaList.length;
+    k = Math.floor(Math.random() * n);
 
-  return UrlFetchApp.fetch(line_endpoint, options);
+    shuffled.push(majikaList[k]);
+    majikaList.splice(k, 1);
+  }
+
+  postImage(groupId, shuffled[0]);
+  postImage(groupId, shuffled[1]);
+  postImage(groupId, shuffled[2]);
+}
+
+/* 画像メッセージを送る */
+function postImage(groupId, stamp) {
+  /* スクリプトプロパティのオブジェクトを取得 */
+  const prop = PropertiesService.getScriptProperties().getProperties();
+  return UrlFetchApp.fetch("https://api.line.me/v2/bot/message/push", {
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + prop.ACCESS_TOKEN, // スクリプトプロパティにトークンは事前に追加しておく
+    },
+    method: "POST",
+    payload: JSON.stringify({
+      to: groupId, // スクリプトプロパティに送信先IDは事前に追加しておく
+      messages: [
+        {
+          type: "image",
+          originalContentUrl: stamp,
+          previewImageUrl: stamp,
+        },
+      ],
+      notificationDisabled: false, // trueだとユーザーに通知されない
+    }),
+  });
 }
