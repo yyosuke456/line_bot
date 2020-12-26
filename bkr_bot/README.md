@@ -1,5 +1,5 @@
-# line_bot
-line bot を作って遊んでみるプロジェクト
+# bkr_bot
+line bot を作って遊んでみる
 
 ## 実装済みの機能
 
