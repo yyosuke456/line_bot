@@ -43,6 +43,14 @@ function getGroupId(e) {
   /* レスポンスを取得 */
   const response = e.postData.getDataAsString();
   const json = JSON.parse(response);
-  const groupId = json["events"][0]["source"]["groupId"];
+  const type = json["events"][0]["source"]["type"];
+  let groupId = "";
+  if (type == "group") {
+    groupId = json["events"][0]["source"]["groupId"];
+  } else if (type == "room") {
+    groupId = json["events"][0]["source"]["roomId"];
+  } else if (type == "user") {
+    groupId = json["events"][0]["source"]["userId"];
+  }
   return groupId;
 }
