@@ -67,6 +67,12 @@ function makeMessage(message, groupId) {
   if (message.indexOf("おやすみ") != -1) {
     return getFromGssGreet();
   }
+  if (message.indexOf("あけおめ") != -1) {
+    return "あけおめ";
+  }
+  if (message.indexOf("おみくじ") != -1) {
+    return runOmikuji();
+  }
   if (message.indexOf("名言") != -1) {
     return getFromGssMeigen();
   }
@@ -203,4 +209,10 @@ function postImage(groupId, stamp) {
       notificationDisabled: false, // trueだとユーザーに通知されない
     }),
   });
+}
+
+function runOmikuji() {
+  const fortuneList = ["大吉", "小吉", "中吉", "吉", "マジきち", "凶", "大凶"];
+  const index = Math.floor(Math.random() * fortuneList.length);
+  return fortuneList[index];
 }
