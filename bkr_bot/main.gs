@@ -102,6 +102,21 @@ function makeMessage(message, groupId) {
     majikaRoulette(groupId);
     return "";
   }
+  if (
+    message.indexOf("ここで働かせてください") != -1 ||
+    message.indexOf("ここで働きたいんです") != -1
+  ) {
+    const reply = getRandomReply();
+    if (reply == "わかったから静かにしておくれ！おおぉお～よ～しよし～……") {
+      reply +=
+        "契約書だよ。そこに名前を書きな。働かせてやる。その代わり嫌だとか、帰りたいとか言ったらすぐ子豚にしてやるからね。";
+      replyFlg = 1;
+    } else {
+      replyFlg = 0;
+    }
+    logger.log(reply);
+    return reply;
+  }
   if (message.indexOf("ソースコード") != -1) {
     return "https://github.com/yyosuke456/line_bot/tree/master/bkr_bot";
   }
