@@ -45,6 +45,24 @@ function doPost(e) {
 }
 
 function makeMessage(message, groupId) {
+  if (replyFlg == 1) {
+    const name = message;
+    const random = Math.round(Math.random() * name.length) - 1;
+    const newName = name.substr(random, 1);
+    let result =
+      "フン。" +
+      name +
+      "というのかい。贅沢な名だねぇ。 今からお前の名前は" +
+      newName +
+      "だ。いいかい、" +
+      newName +
+      "だよ。分かったら返事をするんだ、" +
+      newName +
+      "！！";
+    replyFlg = 0;
+    return result;
+  }
+
   //★step3 GSSからランダムに取得
   if (message.indexOf("食レポ") != -1) {
     return getFromGssRepo();
