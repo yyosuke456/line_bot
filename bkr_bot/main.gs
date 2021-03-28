@@ -1,9 +1,10 @@
 //const ACCESS_TOKEN = スクリプトのプロパティに移動
 //const line_endpoint = スクリプトのプロパティに移動
+let replyFlg = 0;
 
 // 受け取ったメッセージに応じてメッセージを送信
 function doPost(e) {
-  saveMessageResponse(e);
+  // saveMessageResponse(e);
   const groupId = getGroupId(e);
   const json = JSON.parse(e.postData.contents);
 
@@ -45,7 +46,10 @@ function doPost(e) {
 }
 
 function makeMessage(message, groupId) {
-  if (replyFlg == 1) {
+  const sheetName = "flg";
+  const range = "B2";
+  const flg = getSheetVal(sheetName, range);
+  if (flg - 1 == 0) {
     const name = message;
     const random = Math.round(Math.random() * name.length) - 1;
     const newName = name.substr(random, 1);
@@ -62,7 +66,6 @@ function makeMessage(message, groupId) {
     replyFlg = 0;
     return result;
   }
-
   //★step3 GSSからランダムに取得
   if (message.indexOf("食レポ") != -1) {
     return getFromGssRepo();
@@ -101,7 +104,7 @@ function makeMessage(message, groupId) {
     return "https://www.youtube.com/watch?v=N-39ZWTfXSk";
   }
   if (message.indexOf("ボカロの呪文") != -1) {
-    return "食レポ\n美味しい？\nおはよう\nこんにちは\nこんばんは\nはじめまして\nおやすみ\n名言\nシート出して\nwiki\nを検索して\nで検索して\n消臭力\nスタンプ\nまじか";
+    return "食レポ\n美味しい？\nおはよう\nこんにちは\nこんばんは\nはじめまして\nおやすみ\n名言\nシート出して\nwiki\nを検索して\nで検索して\n消臭力\nスタンプ\nまじか\nソースコード";
   }
   if (message.indexOf("wiki") != -1) {
     return getWikiPageRandom();
@@ -124,19 +127,21 @@ function makeMessage(message, groupId) {
     message.indexOf("ここで働かせてください") != -1 ||
     message.indexOf("ここで働きたいんです") != -1
   ) {
-    const reply = getRandomReply();
-    if (reply == "わかったから静かにしておくれ！おおぉお～よ～しよし～……") {
+    let reply = getRandomReply();
+    if (reply.indexOf("わかったから静かにしておくれ") != -1) {
       reply +=
         "契約書だよ。そこに名前を書きな。働かせてやる。その代わり嫌だとか、帰りたいとか言ったらすぐ子豚にしてやるからね。";
-      replyFlg = 1;
+      setSheetVal("flg", "B2", 1);
     } else {
-      replyFlg = 0;
+      setSheetVal("flg", "B2", 0);
     }
-    logger.log(reply);
     return reply;
   }
   if (message.indexOf("ソースコード") != -1) {
     return "https://github.com/yyosuke456/line_bot/tree/master/bkr_bot";
+  }
+  if (message.indexOf("やるか") != -1 || message.indexOf("やりますか") != -1) {
+    return "これがRocketLeagueだ！";
   }
   return "";
 }
@@ -184,7 +189,6 @@ function getFromGssMeigen() {
 //画像メッセージを送る
 //画像の追加→'https://drive.google.com/uc?id=',//
 function pushmessage_image(groupId) {
-  const stampList = ["superCombo", "*"];
   const index = Math.floor(Math.random() * stampList.length);
   if (index == 0) {
     postUperCombo(groupId);
@@ -196,15 +200,9 @@ function pushmessage_image(groupId) {
 }
 
 //スーパーコンボ
-function postUperCombo(groupId) {
-  postImage(groupId, "*");
-  postImage(groupId, "*");
-  postImage(groupId, "*");
-}
+function postUperCombo(groupId) {}
 
 function majikaRoulette(groupId) {
-  const majikaList = ["***"];
-
   let shuffled = [];
 
   while (majikaList.length > 0) {
@@ -242,10 +240,4 @@ function postImage(groupId, stamp) {
       notificationDisabled: false, // trueだとユーザーに通知されない
     }),
   });
-}
-
-function runOmikuji() {
-  const fortuneList = ["大吉", "小吉", "中吉", "吉", "マジきち", "凶", "大凶"];
-  const index = Math.floor(Math.random() * fortuneList.length);
-  return fortuneList[index];
 }

@@ -55,6 +55,12 @@ function getGroupId(e) {
   return groupId;
 }
 
+function runOmikuji() {
+  const fortuneList = ["大吉", "小吉", "中吉", "吉", "マジきち", "凶", "大凶"];
+  const index = Math.floor(Math.random() * fortuneList.length);
+  return fortuneList[index];
+}
+
 function getRandomReply() {
   const replyList = [
     "なんであたしがおまえを雇わなきゃならないんだい！？見るからにグズで！甘ったれで！泣き虫で！頭の悪い小娘に、仕事なんかあるもんかね！お断りだね。これ以上穀潰しを増やしてどうしようっていうんだい！それとも……一番つらーーいきつーーい仕事を死ぬまでやらせてやろうかぁ……？",
@@ -67,4 +73,41 @@ function getRandomReply() {
   ];
   const index = Math.floor(Math.random() * replyList.length);
   return replyList[index];
+}
+
+function testYubba() {
+  let reply = getRandomReply();
+  if (reply.indexOf("わかったから静かにしておくれ") != -1) {
+    reply +=
+      "契約書だよ。そこに名前を書きな。働かせてやる。その代わり嫌だとか、帰りたいとか言ったらすぐ子豚にしてやるからね。";
+    replyFlg = 1;
+  } else {
+    replyFlg = 0;
+  }
+  return reply;
+}
+
+function testSetSeetVal() {
+  const sheetName = "flg";
+  const range = "B2";
+  const val = 1;
+  setSheetVal(sheetName, range, val);
+}
+function testGetSeetVal() {
+  const sheetName = "flg";
+  const range = "B2";
+  const flg = getSheetVal(sheetName, range);
+  Logger.log(flg);
+}
+
+function setSheetVal(sheetName, range, val) {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName(sheetName);
+  sheet.getRange(range).setValue(val);
+}
+
+function getSheetVal(sheetName, range) {
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheetByName(sheetName);
+  return sheet.getRange(range).getValue();
 }
