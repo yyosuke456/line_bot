@@ -56,14 +56,14 @@ function makeMessage(message, groupId) {
     let result =
       "フン。" +
       name +
-      "というのかい。贅沢な名だねぇ。 今からお前の名前は" +
+      "というのかい。贅沢な名だねぇ。 ¥n今からお前の名前は" +
       newName +
       "だ。いいかい、" +
       newName +
       "だよ。分かったら返事をするんだ、" +
       newName +
       "！！";
-    replyFlg = 0;
+    setSheetVal("flg", "B2", 0);
     return result;
   }
   //★step3 GSSからランダムに取得
