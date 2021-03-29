@@ -70,6 +70,7 @@ function getRandomReply() {
     "だァーーーまァーーーれェーーー！！！",
     "おっ おっ おっ おっ おっ おっ おっ",
     "わかったから静かにしておくれ！おおぉお～よ～しよし～……",
+    "わかったから静かにしておくれ！おおぉお～よ～しよし～……",
   ];
   const index = Math.floor(Math.random() * replyList.length);
   return replyList[index];
