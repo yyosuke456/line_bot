@@ -143,6 +143,9 @@ function makeMessage(message, groupId) {
   if (message.indexOf("やるか") != -1 || message.indexOf("やりますか") != -1) {
     return "これがRocketLeagueだ！";
   }
+  if (message.indexOf("？") != -1) {
+    return "？";
+  }
   return "";
 }
 
